@@ -1,95 +1,91 @@
 import React from 'react';
+import Radio from './Form/App';
+
+const perguntas = [
+  {
+    pergunta: 'Qual método é utilizado para criar componentes?',
+    options: [
+      'React.makeComponent()',
+      'React.createComponent()',
+      'React.createElement()',
+    ],
+    resposta: 'React.createElement()',
+    id: 'p1',
+  },
+  {
+    pergunta: 'Como importamos um componente externo?',
+    options: [
+      'import Component from "./Component"',
+      'require("./Component")',
+      'import "./Component"',
+    ],
+    resposta: 'import Component from "./Component"',
+    id: 'p2',
+  },
+  {
+    pergunta: 'Qual hook não é nativo?',
+    options: ['useEffect()', 'useFetch()', 'useCallback()'],
+    resposta: 'useFetch()',
+    id: 'p3',
+  },
+  {
+    pergunta: 'Qual palavra deve ser utilizada para criarmos um hook?',
+    options: ['set', 'get', 'use'],
+    resposta: 'use',
+    id: 'p4',
+  },
+];
 
 const App = () => {
-  // Estado para gerenciar os dados do formulário
-  const [form, setForm] = React.useState({
-    nome: '',
-    email: '',
-    senha: '',
-    cep: '',
-    rua: '',
-    numero: '',
-    bairro: '',
-    cidade: '',
-    estado: '',
+  const [respostas, setRespostas] = React.useState({
+    p1: '',
+    p2: '',
+    p3: '',
+    p4: '',
   });
-  // Estado para armazenar a resposta da API
-
-  const [response, setResponse] = React.useState(null);
-  // Função para lidar com o envio do formulário
-
-  function handleSubmit(event) {
-    event.preventDefault();
-    fetch('https://ranekapi.origamid.dev/json/api/usuario', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(form),
-    }).then((response) => {
-      setResponse(response);
-    });
-  }
+  const [slide, setSlide] = React.useState(0);
+  const [resultado, setResultado] = React.useState(null);
 
   function handleChange({ target }) {
-    const { id, value } = target;
-    setForm({ ...form, [id]: value });
+    setRespostas({ ...respostas, [target.id]: target.value });
   }
-  // Renderização do formulário
+
+  function resultadoFinal() {
+    const corretas = perguntas.filter(
+      ({ id, resposta }) => respostas[id] === resposta,
+    );
+    setResultado(`Você acertou: ${corretas.length} de ${perguntas.length}`);
+  }
+
+  function handleClick() {
+    if (slide < perguntas.length - 1) {
+      setSlide(slide + 1);
+    } else {
+      setSlide(slide + 1);
+      resultadoFinal();
+    }
+  }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="nome">Nome</label>
-      <input type="text" id="nome" value={form.nome} onChange={handleChange} />
-      <label htmlFor="email">Email</label>
-      <input
-        type="email"
-        id="email"
-        value={form.email}
-        onChange={handleChange}
-      />
-      <label htmlFor="senha">Senha</label>
-      <input
-        type="password"
-        id="senha"
-        value={form.senha}
-        onChange={handleChange}
-      />
-      <label htmlFor="cep">Cep</label>
-      <input type="text" id="cep" value={form.cep} onChange={handleChange} />
-      <label htmlFor="senha">Rua</label>
-      <input type="text" id="rua" value={form.rua} onChange={handleChange} />
-      <label htmlFor="numero">Número</label>
-      <input
-        type="text"
-        id="numero"
-        value={form.numero}
-        onChange={handleChange}
-      />
-      <label htmlFor="bairro">Bairro</label>
-      <input
-        type="text"
-        id="bairro"
-        value={form.bairro}
-        onChange={handleChange}
-      />
-      <label htmlFor="cidade">Cidade</label>
-      <input
-        type="text"
-        id="cidade"
-        value={form.cidade}
-        onChange={handleChange}
-      />
-      <label htmlFor="estado">Estado</label>
-      <input
-        type="text"
-        id="estado"
-        value={form.estado}
-        onChange={handleChange}
-      />
-      <button>Enviar</button>
-      {response && response.ok && <p>Usuário Criado</p>}
-    </form>
+    <>
+      <h1>Quiz react</h1>
+      <form onSubmit={(event) => event.preventDefault()}>
+        {perguntas.map((pergunta, index) => (
+          <Radio
+            active={slide === index}
+            key={pergunta.id}
+            value={respostas[pergunta.id]}
+            onChange={handleChange}
+            {...pergunta}
+          />
+        ))}
+        {resultado ? (
+          <p>{resultado}</p>
+        ) : (
+          <button onClick={handleClick}>Próxima</button>
+        )}
+      </form>
+    </>
   );
 };
 
