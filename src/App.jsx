@@ -46,6 +46,7 @@ const App = () => {
   const [slide, setSlide] = React.useState(0);
   const [resultado, setResultado] = React.useState(null);
 
+  // funão que lida com atualização do estado
   function handleChange({ target }) {
     setRespostas({ ...respostas, [target.id]: target.value });
   }
